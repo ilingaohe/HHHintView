@@ -71,13 +71,17 @@
   [self dismiss];
 }
 #pragma mark -- SetupData
+//初始化设置
 - (void)setupData
 {
-  self.positionType = HHHintViewPositionBottom;
-  self.startPoint = HHHintViewAnimationStartBottom;
-  self.animationType = HHHintViewAnimationSlide;
-  self.tapDismiss = NO;
+  //默认设置
+  self.positionType = HHHintViewPositionBottom; //停留在底部
+  self.startPoint = HHHintViewAnimationStartBottom; //动画从底部开始
+  self.animationType = HHHintViewAnimationSlide; //使用Slide动画
+  self.maskType = HHHintViewMaskSuperView; //覆盖住SuperView
+  self.tapDismiss = NO; //点击不消失
 }
+//动画的方向
 - (SEAnimationDirection)animationStartPoint:(HHHintViewAnimationStartPoint)startPoint
 {
   SEAnimationDirection direction = kSEAnimationTop;
@@ -100,6 +104,7 @@
   }
   return direction;
 }
+//动画的起始Center
 - (CGPoint)animationStartCenter:(HHHintViewAnimationStartPoint)startPoint forView:(UIView *)view
 {
   CGPoint startCenter = view.center;
@@ -133,15 +138,23 @@
 {
   //调整位置
   self.backgroundColor = [UIColor clearColor];
+  //需要覆盖SuperView,只对contentView进行动画
+  CGSize parentSize = self.superview.bounds.size;
   self.frame = self.superview.bounds;
-  CGSize parentSize = self.frame.size;
   CGSize contentSize = self.contentView.frame.size;
+  UIView *animationView = self.contentView;
+  //不需要覆盖住SuperView，需要对整个View进行动画
+  if (self.maskType == HHHintViewMaskNone) {
+    self.frame = self.contentView.frame;
+    self.contentView.frame = self.bounds;
+    animationView = self;
+  }
   if (self.positionType == HHHintViewPositionTop) {
-    self.contentView.center = CGPointMake(parentSize.width/2.0f, contentSize.height/2.0f);
+    animationView.center = CGPointMake(parentSize.width/2.0f, contentSize.height/2.0f);
   }else if (self.positionType == HHHintViewPositionMiddle){
-    self.contentView.center = self.center;
+    animationView.center = self.center;
   }else if (self.positionType == HHHintViewPositionBottom){
-    self.contentView.center = CGPointMake(parentSize.width/2.0f, parentSize.height-contentSize.height/2.0f);
+    animationView.center = CGPointMake(parentSize.width/2.0f, parentSize.height-contentSize.height/2.0f);
   }else if (self.positionType == HHHintViewPositionCustom){
     
   }
@@ -156,28 +169,35 @@
 }
 - (void)setupAnimationIn
 {
+  //需要覆盖SuperView,只对contentView进行动画
+  UIView *animationView = self.contentView;
+  //不需要覆盖住SuperView，需要对整个View进行动画
+  if (self.maskType == HHHintViewMaskNone) {
+    animationView = self;
+  }
+  //开始动画
   SEAnimationDirection direction = [self animationStartPoint:self.startPoint];
   if (self.animationType == HHHintViewAnimationFade) {
-    [self.contentView animationFadeInWithDuration:DURATION_OF_ANIMATION];
+    [animationView animationFadeInWithDuration:DURATION_OF_ANIMATION];
   }else if (self.animationType == HHHintViewAnimationSlide){
-    [self.contentView animationSlideInWithDirection:direction boundaryView:self duration:DURATION_OF_ANIMATION];
+    [animationView animationSlideInWithDirection:direction boundaryView:self duration:DURATION_OF_ANIMATION];
   }else if (self.animationType == HHHintViewAnimationSwirl){
-    [self.contentView animationSwirlInWithDuration:DURATION_OF_ANIMATION];
+    [animationView animationSwirlInWithDuration:DURATION_OF_ANIMATION];
   }else if (self.animationType == HHHintViewAnimationBounce){
-    [self.contentView animationBounceInWithDirection:direction boundaryView:self duration:DURATION_OF_ANIMATION];
+    [animationView animationBounceInWithDirection:direction boundaryView:self duration:DURATION_OF_ANIMATION];
   }else if (self.animationType == HHHintViewAnimationDrop){
-    [self.contentView animationDropInWithDuration:DURATION_OF_ANIMATION];
+    [animationView animationDropInWithDuration:DURATION_OF_ANIMATION];
   }else if (self.animationType == HHHintViewAnimationZoom){
     //
-    CGPoint originCenter = self.contentView.center;
-    CGPoint animationStartCenter = [self animationStartCenter:self.startPoint forView:self.contentView];
-    self.contentView.center = animationStartCenter;
-    self.contentView.alpha = 0.8f;
-    self.contentView.transform = CGAffineTransformScale(self.contentView.transform, 0.1, 0.1);
+    CGPoint originCenter = animationView.center;
+    CGPoint animationStartCenter = [self animationStartCenter:self.startPoint forView:animationView];
+    animationView.center = animationStartCenter;
+    animationView.alpha = 0.8f;
+    animationView.transform = CGAffineTransformScale(animationView.transform, 0.1, 0.1);
     [UIView animateWithDuration:DURATION_OF_ANIMATION delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-      self.contentView.transform = CGAffineTransformIdentity;
-      self.contentView.alpha = 1.0f;
-      self.contentView.center = originCenter;
+      animationView.transform = CGAffineTransformIdentity;
+      animationView.alpha = 1.0f;
+      animationView.center = originCenter;
     } completion:^(BOOL finished) {
       //
     }];
@@ -185,25 +205,32 @@
 }
 - (void)setupAnimationOut
 {
+  //需要覆盖SuperView,只对contentView进行动画
+  UIView *animationView = self.contentView;
+  //不需要覆盖住SuperView，需要对整个View进行动画
+  if (self.maskType == HHHintViewMaskNone) {
+    animationView = self;
+  }
+  //开始动画
   SEAnimationDirection direction = [self animationStartPoint:self.startPoint];
   if (self.animationType == HHHintViewAnimationFade) {
-    [self.contentView animationFadeOutWithDuration:DURATION_OF_ANIMATION delegate:self startSelector:nil stopSelector:@selector(dismissCompletion)];
+    [animationView animationFadeOutWithDuration:DURATION_OF_ANIMATION delegate:self startSelector:nil stopSelector:@selector(dismissCompletion)];
   }else if (self.animationType == HHHintViewAnimationSlide){
-    [self.contentView animationSlideOutWithDirection:direction boundaryView:self duration:DURATION_OF_ANIMATION delegate:self startSelector:nil stopSelector:@selector(dismissCompletion)];
+    [animationView animationSlideOutWithDirection:direction boundaryView:self duration:DURATION_OF_ANIMATION delegate:self startSelector:nil stopSelector:@selector(dismissCompletion)];
   }else if (self.animationType == HHHintViewAnimationSwirl){
-    [self.contentView animationSwirlOutWithDuration:DURATION_OF_ANIMATION delegate:self startSelector:nil stopSelector:@selector(dismissCompletion)];
+    [animationView animationSwirlOutWithDuration:DURATION_OF_ANIMATION delegate:self startSelector:nil stopSelector:@selector(dismissCompletion)];
   }else if (self.animationType == HHHintViewAnimationBounce){
-    [self.contentView animationBounceOutWithDirection:direction boundaryView:self duration:DURATION_OF_ANIMATION delegate:self startSelector:nil stopSelector:@selector(dismissCompletion)];
+    [animationView animationBounceOutWithDirection:direction boundaryView:self duration:DURATION_OF_ANIMATION delegate:self startSelector:nil stopSelector:@selector(dismissCompletion)];
   }else if (self.animationType == HHHintViewAnimationDrop){
-    [self.contentView animationDropOutWithDuration:DURATION_OF_ANIMATION  delegate:self startSelector:nil stopSelector:@selector(dismissCompletion)];
+    [animationView animationDropOutWithDuration:DURATION_OF_ANIMATION  delegate:self startSelector:nil stopSelector:@selector(dismissCompletion)];
   }else if (self.animationType == HHHintViewAnimationZoom){
-    self.contentView.transform = CGAffineTransformIdentity;
-    self.contentView.alpha = 1.0f;
-    CGPoint animationStopCenter = [self animationStartCenter:self.startPoint forView:self.contentView];
+    animationView.transform = CGAffineTransformIdentity;
+    animationView.alpha = 1.0f;
+    CGPoint animationStopCenter = [self animationStartCenter:self.startPoint forView:animationView];
     [UIView animateWithDuration:DURATION_OF_ANIMATION delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-      self.contentView.alpha = 0.8f;
-      self.contentView.transform = CGAffineTransformScale(self.contentView.transform, 0.1, 0.1);
-      self.contentView.center = animationStopCenter;
+      animationView.alpha = 0.8f;
+      animationView.transform = CGAffineTransformScale(animationView.transform, 0.1, 0.1);
+      animationView.center = animationStopCenter;
     } completion:^(BOOL finished) {
       //
       [self dismissCompletion];
@@ -245,5 +272,15 @@
 {
   [self dismiss];
 }
-
+- (void)dismissHintViewAnimated:(BOOL)animated
+{
+  if (animated) {
+    [self dismiss];
+  }else{
+    if (self.dismissTimer) {
+      [self.dismissTimer invalidate];
+    }
+    [self dismissCompletion];
+  }
+}
 @end

@@ -85,7 +85,8 @@
   contentView.backgroundColor = [UIColor greenColor];
   //
   HHHintView *hintView = [[HHHintView alloc] initWithContentView:contentView];
-  [hintView setupPositionType:HHHintViewPositionTop animationType:HHHintViewAnimationFade];
+  [hintView setupPositionType:HHHintViewPositionTop animationType:HHHintViewAnimationSlide];
+  [hintView setupStartPoint:HHHintViewAnimationStartTop customStartCenter:CGPointZero];
   //
   [hintView showInView:self.view tapDismiss:YES];
 }

@@ -2,7 +2,7 @@ HHHintView
 ==========
 
 ###说明：
-HHHintView是基于[TBHintView](https://github.com/touchbee/TBHintView)改编的用于iOS上在界面进行Hint提示的一个实现，通过addSubview的方式在原有的界面上显示用来Hint提示的View，并且用removeSubview的方式进行消失。
+[HHHintView](https://github.com/ilingaohe/HHHintView)是基于[TBHintView](https://github.com/touchbee/TBHintView)改编的用于iOS上在界面进行Hint提示的一个实现，通过addSubview的方式在原有的界面上显示用来Hint提示的View，并且用removeSubview的方式进行消失。
 
 
 TBHintView的优点在于，他实现了Hint提示View显示和消失时的各种动画。TBHintView的实现方式是，使用Core Animation实现一系列View切换的效果（SEAnimationFactory类），然后扩展UIView（UIView+SEAnimations类），可以直接在UIView上调用SEAnimationFactory中实现的动画方式。TBHintView类是入口，使用Delegate的方式获取用于Hint显示的View，和控制View的显示和消失。
@@ -11,7 +11,7 @@ TBHintView的优点在于，他实现了Hint提示View显示和消失时的各�
 HHHintView对TBHintView的改编有两处，第一处是把Delegate获取View的方式修改为直接设置UIView作为HHHintView创建时的参数传人，这样的好处是在编写代码的时候，代码比较集中，不会像Delegate实现方式那样分散在不同的地方。第二处是整理了一下动画参数的设置方法。
 
 
-###使用要求方式：
+###使用要求和方式：
 1、需要iOS5.0及以上和ARC的支持
 
 2、把HHHintView文件夹加入你的工程

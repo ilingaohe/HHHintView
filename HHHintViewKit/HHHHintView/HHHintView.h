@@ -38,13 +38,19 @@ typedef enum{
   HHHintViewAnimationSwirl,
   HHHintViewAnimationZoom
 }HHHintViewAnimationType; //页面动画的效果
+
+typedef enum{
+  HHHintViewMaskNone = 0,  //没有覆盖
+  HHHintViewMaskSuperView  //覆盖住SuperView
+}HHHintViewMaskType; //覆盖的范围
 //
 #pragma mark ---
 @interface HHHintView : UIView
 @property (nonatomic, assign) HHHintViewPositionType positionType;
 @property (nonatomic, assign) HHHintViewAnimationStartPoint startPoint;
 @property (nonatomic, assign) HHHintViewAnimationType animationType;
-@property (nonatomic, assign) CGPoint customStartCenter;
+@property (nonatomic, assign) HHHintViewMaskType maskType;
+@property (nonatomic, assign) CGPoint customStartCenter; //自定义动画的起始位置
 
 //设置ContentView，ContentView包含要显示的内容
 - (id)initWithContentView:(UIView *)contentView;
@@ -59,4 +65,5 @@ typedef enum{
 - (void)showInView:(UIView *)view tapDismiss:(BOOL)tapDismiss;
 //
 - (void)dismissHintView;
+- (void)dismissHintViewAnimated:(BOOL)animated;
 @end
