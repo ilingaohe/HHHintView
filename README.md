@@ -41,3 +41,7 @@ HHHintView对TBHintView的改编有两处，第一处是把Delegate获取View的
 ###感谢:
 HHHintView的实现基于GitHub上的两个开源仓库，开头介绍过的[TBHintView](https://github.com/touchbee/TBHintView)和为UIControl类的Event增加Block实现的[ALActionBlocks](https://github.com/lavoy/ALActionBlocks)。
 
+###类似开源控件
+实现HintView功能的还有其他好用的开源控件，比如
+
+1、[ALAertBAnner](https://github.com/alobi/ALAlertBanner).
